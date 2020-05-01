@@ -1,0 +1,19 @@
+GET http://localhost:8000/api/game/new-game
+Accept: application/json
+
+> {%
+   client.global.set("gameId", response.body.id);
+ %}
+###
+
+POST http://localhost:8000/api/game/move
+Content-Type: application/json
+
+{"gameId": "{{gameId}}", "player": "X", "position": 1}
+
+###
+
+GET http://localhost:8000/api/game
+Accept: application/json
+
+###
