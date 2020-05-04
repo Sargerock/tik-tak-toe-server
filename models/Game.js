@@ -15,7 +15,23 @@ const GameSchema = Schema(
 			default: []
 		},
 	},
-	{timestamps: {createdAt: true}}
+	{timestamps: true}
 );
+
+class Game {
+	async makeStep(player, position) {
+		const field = [...this.field];
+		field[position] = player;
+		this.set({field});
+		const step = await Step.create({gameId: this.id, player, position, field});
+		this.history.push(step);
+		await this.save();
+		return this;
+	}
+}
+
+GameSchema.loadClass(Game);
+
+GameSchema.set("toJSON", {virtuals: true})
 
 export default mongoose.model('Game', GameSchema);

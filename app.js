@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 
 import {SERVER_PORT} from "./config";
-import {errorHandler} from "./utils/errorHandler";
+import {errorHandler} from "./utils/error-handler";
 import router from "./routers";
 import "./db"
 

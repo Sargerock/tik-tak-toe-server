@@ -24,4 +24,6 @@ const StepSchema = Schema(
 	}
 );
 
+StepSchema.set("toJSON", {virtuals: true});
+
 export default mongoose.model('Step', StepSchema);
