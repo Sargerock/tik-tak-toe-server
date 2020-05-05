@@ -11,8 +11,11 @@ export const updateGame = async (req, res) => {
 	const bot = player === "X" ? "O" : "X";
 
 	const game = await Game.findById(gameId);
-	if(!game) {
+	if (!game) {
 		return res.status(404).json({message: "Game not found"});
+	}
+	if (game.field[position]) {
+		return res.status(422).json({message: "Validation error", errors: {position: ["Cell isn't empty\n"]}})
 	}
 
 	await game.makeStep(player, position);
@@ -43,7 +46,7 @@ export const getGames = async (req, res) => {
 export const getStep = async (req, res) => {
 	const {id} = req.params;
 	const step = await Step.findById(id);
-	if(!step) {
+	if (!step) {
 		return res.status(404).json({message: "Not found"});
 	}
 	res.status(200).json(step);
@@ -52,7 +55,7 @@ export const getStep = async (req, res) => {
 export const getGame = async (req, res) => {
 	const {id} = req.params;
 	const game = await Game.findById(id);
-	if(!game) {
+	if (!game) {
 		return res.status(404).json({message: "Game not found"});
 	}
 	if (checkWinner(game.field)) {

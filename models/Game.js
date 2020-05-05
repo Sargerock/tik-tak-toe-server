@@ -11,8 +11,7 @@ const GameSchema = Schema(
 			default: new Array(9).fill("")
 		},
 		history: {
-			type: [{type: Schema.Types.ObjectID, ref: "Step"}],
-			default: []
+			type: [{type: Schema.Types.ObjectID, ref: "Step"}]
 		},
 	},
 	{timestamps: true}
@@ -20,10 +19,9 @@ const GameSchema = Schema(
 
 class Game {
 	async makeStep(player, position) {
-		const field = [...this.field];
-		field[position] = player;
-		this.set({field});
-		const step = await Step.create({gameId: this.id, player, position, field});
+		this.field[position] = player;
+		this.markModified("field");
+		const step = await Step.create({gameId: this.id, player, position, field: this.field});
 		this.history.push(step);
 		await this.save();
 		return this;

@@ -2,7 +2,7 @@ import Router from "express-promise-router";
 
 import {updateGame, createGame, getGames, getStep, getGame} from "../controllers/game-controller";
 import {createValidator} from "../utils";
-import {updateGameSchema} from "../utils/validation-schemas";
+import updateGameSchema from "../utils/validation-schemas/update-game-schema";
 
 const updateGameValidator = createValidator({body: updateGameSchema});
 
