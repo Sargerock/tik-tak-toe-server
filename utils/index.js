@@ -9,11 +9,13 @@ const winCases = [
 	[2, 4, 6],
 ];
 
-export const checkWinner = (field) => {
+export const checkVictory = (field) => {
 	return winCases.some(([a, b, c]) =>
 		(field[a] && field[a] === field[b] && field[a] === field[c])
 	);
 }
+
+export const checkDraw = (field) => field.every(value => value);
 
 export const getRandomPosition = (field) => {
 	const availablePositions = field.reduce((acc, cur, index) => {

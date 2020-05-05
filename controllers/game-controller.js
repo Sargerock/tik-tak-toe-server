@@ -1,9 +1,24 @@
 import {Game, Step} from "../models"
-import {checkWinner, getRandomPosition} from "../utils";
+import {checkDraw, checkVictory, getRandomPosition} from "../utils";
 
 export const createGame = async (req, res) => {
-	const game = await Game.create({});
+	const {player} = req.body;
+	const game = await Game.create({player});
 	res.status(201).json(game)
+}
+
+const performAndCheckStep = async (game, player, position) => {
+	if (checkDraw(game.field)) {
+		return true;
+	} else {
+		await game.makeStep(player, position);
+		if (checkVictory(game.field)) {
+			game.winner = player;
+			await game.save();
+			return true;
+		}
+	}
+	return false;
 }
 
 export const updateGame = async (req, res) => {
@@ -18,24 +33,16 @@ export const updateGame = async (req, res) => {
 		return res.status(422).json({message: "Validation error", errors: {position: ["Cell isn't empty\n"]}})
 	}
 
-	await game.makeStep(player, position);
-	if (checkWinner(game.field)) {
-		return res.status(200).json({game, message: `Player wins the game!`, isGameOver: true});
-	}
-	if (game.field.every(value => value)) {
-		return res.status(200).json({game, message: "Draw.", isGameOver: true});
-	} else {
-		await game.makeStep(bot, getRandomPosition(game.field));
-		if (checkWinner(game.field)) {
-			return res.status(200).json({game, message: `Bot wins the game!`, isGameOver: true});
-		}
-	}
-	res.status(200).json({game});
+	const isGameOver =
+		await performAndCheckStep(game, player, position) ||
+		await performAndCheckStep(game, bot, getRandomPosition(game.field));
+
+	res.status(200).json({game, isGameOver});
 }
 
 export const getGames = async (req, res) => {
 	const {offset = 0, limit = 10} = req.query;
-	const games = await Game.find({})
+	const games = await Game.find({winner: {$exists: true}})
 		.sort("-createdAt")
 		.skip(+offset)
 		.limit(+limit)
@@ -58,12 +65,6 @@ export const getGame = async (req, res) => {
 	if (!game) {
 		return res.status(404).json({message: "Game not found"});
 	}
-	if (checkWinner(game.field)) {
-		return res.status(200).json({game, message: `Game is over`, isGameOver: true});
-	}
-	if (game.field.every(value => value)) {
-		return res.status(200).json({game, message: "Draw.", isGameOver: true});
-	} else {
-		res.status(200).json({game});
-	}
+	const isGameOver = checkVictory(game.field) || checkDraw(game.field);
+	res.status(200).json({game, isGameOver});
 }

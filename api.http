@@ -1,9 +1,12 @@
 POST http://localhost:8000/api/game/
-Accept: application/json
+Content-Type: application/json
+
+{"player": "X"}
 
 > {%
    client.global.set("gameId", response.body.id);
  %}
+
 ###
 
 PUT http://localhost:8000/api/game/

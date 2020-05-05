@@ -6,6 +6,11 @@ const {Schema} = mongoose;
 
 const GameSchema = Schema(
 	{
+		player: {
+			type: String,
+			required: true
+		},
+		winner: String,
 		field: {
 			type: [String],
 			default: new Array(9).fill("")
