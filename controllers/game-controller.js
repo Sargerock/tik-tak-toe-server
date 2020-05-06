@@ -4,21 +4,21 @@ import {checkDraw, checkVictory, getRandomPosition} from "../utils";
 export const createGame = async (req, res) => {
 	const {player} = req.body;
 	const game = await Game.create({player});
+	if (player === "O") {
+		await game.makeStep("X", getRandomPosition(game.field));
+	}
 	res.status(201).json(game)
 }
 
 const performAndCheckStep = async (game, player, position) => {
-	if (checkDraw(game.field)) {
+	await game.makeStep(player, position);
+	if (checkVictory(game.field)) {
+		game.winner = player;
+		await game.save();
 		return true;
 	} else {
-		await game.makeStep(player, position);
-		if (checkVictory(game.field)) {
-			game.winner = player;
-			await game.save();
-			return true;
-		}
+		return checkDraw(game.field);
 	}
-	return false;
 }
 
 export const updateGame = async (req, res) => {
