@@ -16,8 +16,12 @@ const performAndCheckStep = async (game, player, position) => {
 		game.winner = player;
 		await game.save();
 		return true;
+	} else if (checkDraw(game.field)) {
+		game.winner = "";
+		await game.save();
+		return true;
 	} else {
-		return checkDraw(game.field);
+		return false
 	}
 }
 
